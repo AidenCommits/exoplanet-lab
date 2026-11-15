@@ -1,0 +1,43 @@
+[project]
+name = "exoplanet-lab"
+version = "0.1.0"
+description = "Generate exoplanet transit light curves, run an analysis pipeline on them, and score the results."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    # Science: data generator and analysis pipeline
+    "numpy",
+    "scipy",
+    "astropy",
+    "batman-package",
+    "lightkurve",
+    # Notebooks and figures
+    "jupyterlab",
+    "matplotlib",
+    # API
+    "fastapi[standard]",
+    "pydantic",
+    # Batch scoring results
+    "joblib",
+    "duckdb",
+    "pyarrow",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff",
+    "mypy",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N"]
+
+[tool.mypy]
+strict = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

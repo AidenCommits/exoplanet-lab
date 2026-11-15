@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.ipynb_checkpoints/
+build/
+dist/
+
+# Node / frontend
+node_modules/
+frontend/dist/
+
+# Environment and secrets
+.env
+.env.*
+
+# Generated data (regenerate from seeds)
+data/generated/
+*.parquet
+
+# OS and editors
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+~$*
