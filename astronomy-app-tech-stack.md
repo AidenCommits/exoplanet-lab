@@ -2,12 +2,14 @@
 
 Full plan: https://claude.ai/artifact/SfrXveDFvyHViMbSyUHFuZ
 
+Python version: 3.13, the newest version all packages support as of Nov 2026 (3.15 and 3.14 failed to install the stack). Pinned in `.python-version`.
+
 Rule: Python for the science and the API; TypeScript for the frontend. No other languages unless this file is updated.
 
 | Part | Language | Tools |
 | --- | --- | --- |
-| Data generator | Python 3.12 | numpy, scipy, batman |
-| Analysis pipeline | Python 3.12 | astropy (BLS), scipy, lightkurve; numba only if profiling shows a slow loop |
+| Data generator | Python 3.13 | numpy, scipy, batman |
+| Analysis pipeline | Python 3.13 | astropy (BLS), scipy, lightkurve; numba only if profiling shows a slow loop |
 | Notebooks | Python | Jupyter, matplotlib |
 | API | Python | FastAPI, Pydantic |
 | Frontend | TypeScript | React, Vite, Plotly.js, Tailwind |
