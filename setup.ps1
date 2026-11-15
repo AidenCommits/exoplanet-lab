@@ -18,7 +18,7 @@
 $ErrorActionPreference = "Stop"
 Set-Location -Path $PSScriptRoot
 
-$RepoUrl = "https://github.com/__GITHUB_USER__/exoplanet-lab.git"
+$RepoUrl = "https://github.com/AidenCommits/exoplanet-lab.git"
 $PythonCandidates = @("3.15", "3.14", "3.13", "3.12")
 
 function Write-Step([string]$Message) {
