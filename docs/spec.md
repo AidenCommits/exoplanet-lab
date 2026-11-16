@@ -33,7 +33,7 @@ One planet at most per star in v1.
 | Planet radius | 0.8–15 R⊕ | Sets depth ≈ (Rₚ/R★)² |
 | Orbital period | 0.5–13.5 days | ≥ 2 transits in the sector; presets except Trap need ≥ 3 |
 | Impact parameter b | 0–0.9 (up to 1.05 in Trap) | > ~0.9 is grazing (V-shaped) |
-| Limb darkening | quadratic, fixed by star type | From batman |
+| Limb darkening | quadratic, fixed by star type | Coefficients from Claret (2017), applied by batman |
 | Orbit | circular | Eccentric orbits out of scope |
 | Noise per point | 100–3000 ppm | White (random) noise |
 | Star activity amplitude | 0–2 % | Starspot modulation |
@@ -43,15 +43,38 @@ One planet at most per star in v1.
 Transit duration is not set directly: it follows from period, star size/mass and b (Kepler's third law).
 
 ### 2.4 Presets
-| Preset | Mix | Typical settings |
-| --- | --- | --- |
-| Easy | Planet | Large planet, low noise, quiet star, ≥ 4 transits |
-| Medium | Planet or no_planet | Neptune-size, moderate noise, mild activity |
-| Hard | Planet or no_planet | Small planet, high noise, active star |
-| Trap | Any type | EBs with near-equal eclipses, spot-only stars, grazing planets, 2-transit planets, alias-prone periods |
-| Custom | Owner's choice | All sliders available |
+Presets choose randomly within their ranges using the seed. Star radius is 0.5–1.5 R☉ in every preset.
 
-Presets choose randomly within their ranges using the seed.
+**Difficulty is set by expected SNR, not by noise.** Each planet scenario draws a target SNR, then
+solves for the noise per point: σ = depth × √N ÷ SNR, where depth comes from the noise-free model
+(limb darkening included) and N is the number of observed in-transit points after gaps. If σ falls
+outside 100–3000 ppm, the draw is repeated. `no_planet` scenarios in Medium and Hard go through the
+same steps with a phantom planet that is then discarded, so their noise levels match the planet
+scenarios and don't give the answer away. Expected SNR counts white noise only (it ignores star
+activity).
+
+| Preset | Mix | Target SNR | Rₚ (R⊕) | P (d) | b | Activity | Rotation (d) | Extra gaps | Transits |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Easy | 100 % planet | 20–200 (log-uniform) | 8–15 | 0.5–6 | 0–0.7 | 0–0.1 % | 5–15 | off | ≥ 4 |
+| Medium | 70 % planet / 30 % no_planet | 10–20 | 2.5–5 | 1–9 | 0–0.8 | 0.1–0.5 % | 2–15 | 50 % chance | ≥ 3 |
+| Hard | 70 % planet / 30 % no_planet | 6–10 | 0.8–3 | 1–12 | 0–0.9 | 0.5–2 % | 1–15 | 50 % chance | ≥ 3 |
+| Trap | One of six kinds below, equally likely | see below | | | | | | 50 % chance | ≥ 2 |
+| Custom | Owner's choice | — | All sliders available | | | | | | ≥ 2 |
+
+Hard's SNR range straddles the default vetting threshold of 7, so some Hard planets are expected
+to be missed.
+
+**Trap kinds** (recorded as `trap_kind` in the answer key). Noise is log-uniform in 100–3000 ppm
+unless stated.
+
+| `trap_kind` | Type | Settings | Why it's a trap |
+| --- | --- | --- | --- |
+| `near_equal_eb` | eclipsing_binary | Primary 1–5 %, secondary 80–100 % of primary | Folded at P/2 it looks like one planet; only an odd/even depth test catches it |
+| `spot_only` | no_planet | Activity 1–2 %, rotation 1–5 d, noise 100–1000 ppm | Spot dips can give false BLS peaks |
+| `grazing_planet` | planet | b 0.9–1.05, Rₚ 8–15 R⊕, SNR 15–50 | V-shaped dip that looks like a binary |
+| `two_transit` | planet | P 9–13.5 d, exactly 2 observed transits, Rₚ 2–10 R⊕, SNR 10–30 | Few repeats to confirm the period |
+| `alias_gap` | planet | Middle of 3 transits falls in the mid-sector gap, Rₚ 2–10 R⊕, SNR 10–30 | The 2 observed transits fit P and 2P equally well |
+| `classic_eb` | eclipsing_binary | Primary 1–30 %, secondary 5–60 % of primary | Baseline binary for the secondary-eclipse test |
 
 ### 2.5 Answer key
 Saved with every scenario, separately from the light curve:
@@ -60,9 +83,13 @@ Saved with every scenario, separately from the light curve:
 - For planets: period, t0 (first mid-transit time), duration, depth, Rₚ/R★, Rₚ in R⊕, a/R★, b, number of transits in the data
 - For EBs: true orbital period, primary and secondary eclipse depths
 - Star: radius, mass, noise level, activity amplitude and rotation period
+- `trap_kind`: which Trap sub-kind produced the scenario (null outside the Trap preset)
+- `expected_snr`: depth ÷ noise per point × √(observed in-transit points), white noise only
+  (null when there is no planet)
 
 **Blind mode (default on):** the app hides the answer key until the owner submits a result for that
-scenario. It can be switched off for learning and debugging.
+scenario. This covers every field above, including `trap_kind` and `expected_snr`. It can be
+switched off for learning and debugging.
 
 ### 2.6 Storage
 - Light curve: Parquet file with columns `time`, `flux`, `flux_err`.

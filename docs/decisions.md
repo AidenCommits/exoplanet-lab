@@ -1,0 +1,19 @@
+# Decisions log
+
+Newest first. Each entry says what was decided and why. Details live in `docs/spec.md`.
+
+## 2026-11-16: Phase 3 data generator
+
+| # | Decision | Why |
+| --- | --- | --- |
+| 1 | Use a `src/` layout (`src/exoplanet_lab/`) built with the `uv_build` backend. | Tests and notebooks import the installed package, not loose files. |
+| 2 | Presets target an **expected-SNR range** and solve for the noise level, instead of drawing radius and noise independently. Easy 20–200 (log-uniform), Medium 10–20, Hard 6–10. | SNR controls difficulty directly. Solving for noise has an exact answer; solving for radius doesn't, because of limb darkening. |
+| 3 | Easy is planet-only with ≥ 4 transits; Medium and Hard are 70 % planet / 30 % no_planet; every non-Trap preset needs ≥ 3 transits. | Matches the spec's intent with a stated mix ratio. |
+| 4 | Medium planet radius is 2.5–5 R⊕ (was 3–6). | Larger planets at SNR 10–20 would need noise above the 3000 ppm cap. |
+| 5 | `no_planet` scenarios use a discarded "phantom" planet to set their noise. | Otherwise the noise level alone would hint at the answer. |
+| 6 | Trap has six kinds: `near_equal_eb`, `spot_only`, `grazing_planet`, `two_transit`, `alias_gap`, `classic_eb`. | The spec listed five; `classic_eb` was added so binaries aren't only ever the near-equal kind. |
+| 7 | `alias_gap` means the middle of three transits falls in the mid-sector gap. | Turns the spec's vague "alias-prone periods" into a case where 2P is a true alias. |
+| 8 | Answer key gains `trap_kind` and `expected_snr`; blind mode hides them with the rest of the key. | Batch scoring (Phase 6) breaks results down by trap kind and by SNR. |
+| 9 | Quadratic limb-darkening coefficients come from a small table based on Claret (2017), applied by batman. | batman computes the model but doesn't supply coefficients. |
+| 10 | The planted-transit recovery test does both checks: (a) fold at the true ephemeris and measure the depth, and (b) run astropy's `BoxLeastSquares` with default settings and recover the period within 1 %. | (b) checks the generator only; it is not pipeline code. |
+| 11 | The decisions log is this Markdown file, replacing the empty `decisions.docx.docx`. | Plain text shows clean diffs in git. |
