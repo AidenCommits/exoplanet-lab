@@ -8,7 +8,9 @@
 
     1. Installs Git, uv, Node.js (LTS) and Claude Code if they are missing.
     2. Installs the newest Python that every package supports
-       (tries 3.15 first, then older versions) and creates the .venv environment from pyproject.toml / uv.lock.
+       (tries 3.15 first, then older versions) and creates the Python environment from
+       pyproject.toml / uv.lock. If the repo is inside OneDrive, the environment is placed
+       outside it (see "Python environment location" in README.md).
     3. Writes requirements.txt (pinned list for plain pip).
     4. First time only: creates the git repo, makes the first commit and pushes to GitHub.
 
@@ -67,6 +69,19 @@ if (Test-Command "claude") {
 
 # --- 2. Python environment ----------------------------------------------------
 Write-Step "Setting up the Python environment"
+
+# OneDrive locks files while it syncs them, which breaks `uv sync` inside a OneDrive folder.
+# If the repo is in OneDrive, keep the environment outside it via UV_PROJECT_ENVIRONMENT
+# (a user-level variable). See "Python environment location" in README.md.
+$inOneDrive = $env:OneDrive -and $PSScriptRoot.StartsWith($env:OneDrive, [StringComparison]::OrdinalIgnoreCase)
+if ($inOneDrive -and -not $env:UV_PROJECT_ENVIRONMENT) {
+    $envPath = Join-Path $env:USERPROFILE ".venvs\exoplanet-lab"
+    [Environment]::SetEnvironmentVariable("UV_PROJECT_ENVIRONMENT", $envPath, "User")
+    $env:UV_PROJECT_ENVIRONMENT = $envPath
+    Write-Host "Repo is inside OneDrive; the Python environment will live in $envPath"
+}
+$venvPath = if ($env:UV_PROJECT_ENVIRONMENT) { $env:UV_PROJECT_ENVIRONMENT } else { ".venv" }
+
 $chosen = $null
 if (Test-Path ".python-version") {
     $chosen = (Get-Content ".python-version" -Raw).Trim()
@@ -86,7 +101,7 @@ if (Test-Path ".python-version") {
             break
         }
         Write-Host "Some packages don't support Python $version yet; trying an older version." -ForegroundColor Yellow
-        if (Test-Path ".venv") { Remove-Item ".venv" -Recurse -Force }
+        if (Test-Path $venvPath) { Remove-Item $venvPath -Recurse -Force }
         if (Test-Path "uv.lock") { Remove-Item "uv.lock" -Force }
     }
     if (-not $chosen) { throw "Couldn't build the environment with any of: $($PythonCandidates -join ', ')" }

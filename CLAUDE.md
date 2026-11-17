@@ -38,6 +38,10 @@ and shows them as charts. The full plan is in `Astronomy Data App — Project Pl
   `uv add <package>`, never with a bare `pip install`, then regenerate `requirements.txt`
   with `uv export --format requirements-txt --no-hashes -o requirements.txt`.
 - No database or user accounts in v1.
+- The Python environment is **not** in the repo: on the owner's machine it lives at
+  `%USERPROFILE%\.venvs\exoplanet-lab`, set by the user-level `UV_PROJECT_ENVIRONMENT`
+  variable, because OneDrive locks files inside `.venv`. Never recreate a `.venv` in the repo.
+  See README.md, "Python environment location".
 
 ## Quality bar
 Code a hiring manager would respect: clear names, type hints, docstrings, tests for the
