@@ -49,9 +49,12 @@ mypy_path = "src"
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-# batman, scipy and pyarrow ship no type hints.
-module = ["batman", "scipy.*", "pyarrow", "pyarrow.*"]
+# batman, scipy, pyarrow and astropy ship no type hints.
+module = ["batman", "scipy.*", "pyarrow", "pyarrow.*", "astropy", "astropy.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "slow: runs a BLS search (about a second each); skip with -m \"not slow\"",
+]
