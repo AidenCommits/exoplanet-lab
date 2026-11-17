@@ -64,6 +64,18 @@ class TransitStats:
 
 
 @dataclass(frozen=True)
+class LightCurve:
+    """The observed data only, exactly what a pipeline sees. Arrays share one length."""
+
+    time: FloatArray
+    """Time stamps in days from the start of the sector."""
+    flux: FloatArray
+    """Relative flux, normalized to a median of 1."""
+    flux_err: FloatArray
+    """1σ uncertainty of each flux point."""
+
+
+@dataclass(frozen=True)
 class Scenario:
     """One generated scenario: the observed light curve, the noise-free truth, and the key.
 
@@ -79,6 +91,11 @@ class Scenario:
     model_flux: FloatArray
     """Noise-free transit or eclipse model, without starspots: 1 outside transits/eclipses."""
     answer_key: AnswerKey
+
+    @property
+    def light_curve(self) -> LightCurve:
+        """The observed data without any truth (no model flux, no answer key)."""
+        return LightCurve(time=self.time, flux=self.flux, flux_err=self.flux_err)
 
 
 # --- transit bookkeeping -------------------------------------------------------------------

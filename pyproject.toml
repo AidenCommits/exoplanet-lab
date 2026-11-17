@@ -49,8 +49,8 @@ mypy_path = "src"
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-# batman and scipy ship no type hints.
-module = ["batman", "scipy.*"]
+# batman, scipy and pyarrow ship no type hints.
+module = ["batman", "scipy.*", "pyarrow", "pyarrow.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
