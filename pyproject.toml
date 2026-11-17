@@ -21,6 +21,9 @@ dependencies = [
     "joblib",
     "duckdb",
     "pyarrow",
+    # Only so batman imports: batman 2.5.x imports distutils, removed from Python 3.12+;
+    # setuptools provides a stand-in. Remove once batman drops distutils.
+    "setuptools>=84.2.1",
 ]
 
 [build-system]
@@ -44,6 +47,11 @@ select = ["E", "F", "I", "B", "UP", "N"]
 strict = true
 mypy_path = "src"
 plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+# batman and scipy ship no type hints.
+module = ["batman", "scipy.*"]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
