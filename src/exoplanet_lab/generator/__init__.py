@@ -5,6 +5,7 @@ light curve and its answer key.
 """
 
 from exoplanet_lab.generator.answer_key import AnswerKey
+from exoplanet_lab.generator.presets import draw_settings, generate_preset_scenario
 from exoplanet_lab.generator.scenario import Scenario, generate_scenario
 from exoplanet_lab.generator.settings import (
     BinarySettings,
@@ -28,5 +29,7 @@ __all__ = [
     "ScenarioType",
     "StarSettings",
     "TrapKind",
+    "draw_settings",
+    "generate_preset_scenario",
     "generate_scenario",
 ]

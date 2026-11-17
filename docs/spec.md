@@ -55,11 +55,14 @@ activity).
 
 | Preset | Mix | Target SNR | Rₚ (R⊕) | P (d) | b | Activity | Rotation (d) | Extra gaps | Transits |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Easy | 100 % planet | 20–200 (log-uniform) | 8–15 | 0.5–6 | 0–0.7 | 0–0.1 % | 5–15 | off | ≥ 4 |
-| Medium | 70 % planet / 30 % no_planet | 10–20 | 2.5–5 | 1–9 | 0–0.8 | 0.1–0.5 % | 2–15 | 50 % chance | ≥ 3 |
+| Easy | 100 % planet | 30–200 (log-uniform) | 8–15 | 0.5–6 | 0–0.7 | 0–0.1 % | 5–15 | off | ≥ 4 |
+| Medium | 70 % planet / 30 % no_planet | 10–30 | 2.5–5 | 1–9 | 0–0.8 | 0.1–0.5 % | 2–15 | 50 % chance | ≥ 3 |
 | Hard | 70 % planet / 30 % no_planet | 6–10 | 0.8–3 | 1–12 | 0–0.9 | 0.5–2 % | 1–15 | 50 % chance | ≥ 3 |
 | Trap | One of six kinds below, equally likely | see below | | | | | | 50 % chance | ≥ 2 |
 | Custom | Owner's choice | — | All sliders available | | | | | | ≥ 2 |
+
+The SNR ranges join up with no gaps: Hard 6–10, Medium 10–30, Easy 30–200. SNR ranges are
+uniform unless marked log-uniform.
 
 Hard's SNR range straddles the default vetting threshold of 7, so some Hard planets are expected
 to be missed.
@@ -75,6 +78,10 @@ unless stated.
 | `two_transit` | planet | P 9–13.5 d, exactly 2 observed transits, Rₚ 2–10 R⊕, SNR 10–30 | Few repeats to confirm the period |
 | `alias_gap` | planet | Middle of 3 transits falls in the mid-sector gap, Rₚ 2–10 R⊕, SNR 10–30 | The 2 observed transits fit P and 2P equally well |
 | `classic_eb` | eclipsing_binary | Primary 1–30 %, secondary 5–60 % of primary | Baseline binary for the secondary-eclipse test |
+
+Trap values not listed above: binaries have P 1–9 d, b 0–0.9 and ≥ 2 observed primary eclipses;
+`grazing_planet` has P 1–9 d; `alias_gap` has P 7–13.4 d so the sector holds exactly 3 transits.
+Every kind except `spot_only` uses activity 0.1–0.5 % and rotation 2–15 d.
 
 ### 2.5 Answer key
 Saved with every scenario, separately from the light curve:
