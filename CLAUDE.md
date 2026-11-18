@@ -38,9 +38,13 @@ and shows them as charts. The full plan is in `Astronomy Data App — Project Pl
   `uv add <package>`, never with a bare `pip install`, then regenerate `requirements.txt`
   with `uv export --format requirements-txt --no-hashes -o requirements.txt`.
 - No database or user accounts in v1.
-- The Python environment is **not** in the repo: on the owner's machine it lives at
-  `%USERPROFILE%\.venvs\exoplanet-lab`, set by the user-level `UV_PROJECT_ENVIRONMENT`
-  variable, because OneDrive locks files inside `.venv`. Never recreate a `.venv` in the repo.
+- Where the Python environment lives depends on where the repo is (decision 13):
+  - **Repo outside OneDrive:** uv's default in-repo `.venv` is fine (it is gitignored).
+  - **Repo inside OneDrive:** OneDrive locks files inside `.venv`, so the environment lives at
+    `%USERPROFILE%\.venvs\exoplanet-lab`, set by the user-level `UV_PROJECT_ENVIRONMENT`
+    variable. `setup.ps1` sets this up automatically. Never create a `.venv` inside a OneDrive
+    copy of the repo.
+
   See README.md, "Python environment location".
 
 ## Quality bar

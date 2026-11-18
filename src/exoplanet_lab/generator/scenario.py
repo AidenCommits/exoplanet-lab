@@ -18,7 +18,6 @@ import math
 from dataclasses import dataclass
 
 import numpy as np
-from numpy.typing import NDArray
 
 from exoplanet_lab.generator.answer_key import (
     AnswerKey,
@@ -41,9 +40,7 @@ from exoplanet_lab.generator.signals import (
     white_noise,
 )
 from exoplanet_lab.generator.timeseries import CADENCE_DAYS, TimeGrid, make_time_grid
-
-FloatArray = NDArray[np.float64]
-BoolArray = NDArray[np.bool_]
+from exoplanet_lab.lightcurve import BoolArray, FloatArray, LightCurve
 
 MIN_OBSERVED_TRANSITS = 2
 """Fewest observed transits any planet scenario may have (spec 2.3). Presets ask for more."""
@@ -61,18 +58,6 @@ class TransitStats:
     n_transits_observed: int
     n_in_transit_points: int
     """Observed points inside any transit window."""
-
-
-@dataclass(frozen=True)
-class LightCurve:
-    """The observed data only, exactly what a pipeline sees. Arrays share one length."""
-
-    time: FloatArray
-    """Time stamps in days from the start of the sector."""
-    flux: FloatArray
-    """Relative flux, normalized to a median of 1."""
-    flux_err: FloatArray
-    """1σ uncertainty of each flux point."""
 
 
 @dataclass(frozen=True)

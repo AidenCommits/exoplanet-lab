@@ -21,7 +21,8 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from exoplanet_lab.generator.answer_key import AnswerKey
-from exoplanet_lab.generator.scenario import LightCurve, Scenario
+from exoplanet_lab.generator.scenario import Scenario
+from exoplanet_lab.lightcurve import LightCurve
 
 LIGHT_CURVE_COLUMNS = ("time", "flux", "flux_err")
 """The Parquet columns, in order (spec 2.6)."""

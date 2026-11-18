@@ -2,6 +2,20 @@
 
 Newest first. Each entry says what was decided and why. Details live in `docs/spec.md`.
 
+## 2026-11-18: Phase 4 analysis pipeline, step 0 (interfaces)
+
+| # | Decision | Why |
+| --- | --- | --- |
+| 21 | The contract's `depth` is the fitted model's dip at mid-transit, 1 − model(t0), the same definition as the answer key. | The BLS box depth averages over the transit and is always shallower than the mid-transit depth, so scoring it against the key would show a built-in bias that is not the pipeline's fault. |
+| 22 | `candidate` is null only when no signal was fitted; then the verdict is `no_planet` and there are no vetting flags. A fitted signal is always reported, whatever the verdict; `planet` and `eclipsing_binary` need a candidate. When there is a candidate, each of the five vetting tests appears exactly once, with `passed` null if it could not run. The model enforces these rules. | Scoring and the Results screen get one unambiguous shape, and a rejected signal (for example a binary) still shows what was found. |
+| 23 | SNR = δ ÷ (σ ÷ √N_in): mean out-of-transit minus mean in-transit flux of the detrended data, over a robust out-of-transit scatter (1.4826 × MAD), with the fitted ephemeris (spec 3.2). The SNR threshold of 7 applies to this. | One measured definition that any method can compute. Measured scatter counts leftover star activity as noise, which is honest. It is usually somewhat below the key's `expected_snr` (mid-transit depth, white noise only), as `test_folded_dip_snr_matches_expected_snr` already shows. |
+| 24 | The reported `t0` may be any observed transit; scoring shifts it by whole periods to the nearest true mid-transit. | A fit is best constrained near the middle of the data. Forcing the first transit would make the owner add an epoch conversion that only inflates the t0 uncertainty. |
+| 25 | The pipeline is `src/exoplanet_lab/pipeline/`, one module per step. Each step is a pure function `step(previous output, settings) -> StepResult`. Settings are frozen Pydantic models with defaults and bounds (the app builds its controls from their JSON schema). Step outputs are frozen dataclasses of numpy arrays and scalars that hold what each chart needs. The owner writes every function body; Claude wrote only the signatures, types and docstrings (inputs and outputs, never method). | Each step can be charted and re-run alone, and tested on its own. |
+| 26 | `LightCurve` moved to `exoplanet_lab.lightcurve`, outside the generator. A test checks that importing the pipeline loads no generator module. | Enforces blind mode in code: the pipeline cannot reach the answer key or the noise-free model, and the same input type will carry real TESS data in Phase 6. |
+| 27 | Default settings: detrend window 0.75 d; periods 0.5–13.7 d; trial durations 0.04, 0.08, 0.16, 0.24 d (decision 20); bin width 10 min; SNR threshold 7. | The longest preset transit is about 5.2 h (0.22 d), and a window of about 3× the longest transit protects it. 13.7 d is half a sector, the longest period with two transits. These are starting points that the owner tunes in each step. |
+| 28 | Step acceptance tests are written before the owner's code, test results rather than a specific method, and are walked through with the owner before each step starts. Shared fixtures in `tests/pipeline/scenario_library.py` give cached preset scenarios and spot-free twins. | Tests define what "working" means without dictating the science. Twins give an exact truth for detrending (decision 15). |
+| 29 | CLAUDE.md now matches decision 13: an in-repo `.venv` is fine when the repo is outside OneDrive; inside OneDrive the environment lives at `%USERPROFILE%\.venvs\exoplanet-lab` via `UV_PROJECT_ENVIRONMENT`, as `setup.ps1` sets up. | CLAUDE.md said never to have an in-repo `.venv`, which contradicted decision 13 on machines where the repo is not in OneDrive. |
+
 ## 2026-11-16: Phase 3 data generator
 
 | # | Decision | Why |

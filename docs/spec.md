@@ -118,10 +118,46 @@ Every step must return its intermediate output so the app can chart it, and ever
 adjustable from the app.
 
 ### 3.2 Result contract
-The pipeline returns one result per scenario:
+The pipeline returns one result per scenario (`exoplanet_lab.pipeline.contract.PipelineResult`):
 - `verdict`: `planet`, `no_planet` or `eclipsing_binary`
-- If a candidate was found: period, t0, duration, depth, Rₚ/R★ (each with uncertainty), SNR
-- Vetting flags (pass/fail per test, with the measured value)
+- `candidate`: the signal the pipeline fitted, or null (see "No candidate" below). Each value
+  comes with a 1σ uncertainty from the fit:
+  - `period` [d]
+  - `t0` [d]: the mid-time of any one transit, on the light curve's time axis. Scoring shifts it
+    by whole periods to the nearest true mid-transit before applying the t0 match rule.
+  - `duration` [d]: total duration T14 (first to last contact) of the fitted model.
+  - `depth`: the dip of the **fitted noise-free model at mid-transit**, 1 − model(t0), limb
+    darkening included. This is the answer key's definition. It is not the BLS box depth
+    (an average over the transit, so shallower) and not (Rₚ/R★)².
+  - `radius_ratio`: Rₚ/R★ from the fit.
+  - `snr` (no uncertainty): defined below.
+
+  An uncertainty may be null when the fit cannot estimate it; scoring then counts the true value
+  as outside both the 1σ and 2σ error bars.
+- `vetting`: one flag per test (`snr`, `odd_even`, `secondary_eclipse`, `shape`, `physical`), each
+  with `passed` (true, false, or null if the test could not run), the measured `value`, the
+  `threshold` it was compared with, and a short `note` giving its meaning and unit.
+- `settings`: the pipeline settings the result was made with.
+
+**No candidate.** `candidate` is null only when the pipeline fitted no signal (for example, the
+search found nothing worth fitting, or the fit failed). Then `verdict` must be `no_planet` and
+`vetting` is empty. Whenever a signal is fitted, `candidate` is filled whatever the verdict, so a
+rejected signal (such as a binary) still shows what was found. A `planet` or `eclipsing_binary`
+verdict always has a candidate.
+
+**SNR.** Using the fitted period, t0 and duration on the detrended light curve:
+
+    SNR = δ ÷ (σ ÷ √N_in)
+
+- In-transit points: within duration ÷ 2 of a fitted mid-transit time; N_in is how many.
+- Out-of-transit points: more than one full duration from every fitted mid-transit time.
+- δ = mean out-of-transit flux − mean in-transit flux.
+- σ = 1.4826 × the median absolute deviation of the out-of-transit flux (a robust per-point
+  scatter, measured from the data so that leftover star activity counts as noise).
+
+The vetting SNR threshold (default 7) applies to this SNR. Because δ averages over the whole
+transit, and σ includes any leftover activity, this SNR is usually somewhat below the answer
+key's `expected_snr`, which uses the mid-transit depth and white noise only.
 
 ## 4. Scoring
 
