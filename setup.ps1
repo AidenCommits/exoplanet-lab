@@ -39,6 +39,18 @@ function Test-Command([string]$Name) {
     return [bool](Get-Command $Name -ErrorAction SilentlyContinue)
 }
 
+function Add-UserPathEntry([string]$Folder) {
+    # Permanently add a folder to the user-level PATH (never the machine PATH) if it's missing.
+    $user = [Environment]::GetEnvironmentVariable("Path", "User")
+    $entries = @(($user -split ";") | Where-Object { $_ -ne "" })
+    $wanted = $Folder.TrimEnd("\")
+    foreach ($entry in $entries) {
+        if ($entry.TrimEnd("\") -ieq $wanted) { return }
+    }
+    [Environment]::SetEnvironmentVariable("Path", (($entries + $wanted) -join ";"), "User")
+    Write-Host "Added $wanted to your user PATH. New terminal windows will find it."
+}
+
 function Install-WithWinget([string]$Command, [string]$WingetId, [string]$Label) {
     if (Test-Command $Command) {
         Write-Host "$Label is already installed."
@@ -66,6 +78,9 @@ if (Test-Command "claude") {
     Invoke-RestMethod https://claude.ai/install.ps1 | Invoke-Expression
     Update-SessionPath
 }
+# The Claude Code installer puts claude.exe in %USERPROFILE%\.local\bin but doesn't always add that
+# folder to PATH, so new terminals can't find `claude`. Add it to the user PATH permanently.
+Add-UserPathEntry "$env:USERPROFILE\.local\bin"
 
 # --- 2. Python environment ----------------------------------------------------
 Write-Step "Setting up the Python environment"
